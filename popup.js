@@ -1,7 +1,7 @@
-// popup.js — Tab RAM Guard UI controller
+// popup.js — Tab RAM Guard v2 (idle-based)
 
 const DEFAULTS = {
-  thresholdMB: 500,
+  idleMinutes: 30,
   action: "discard",
   notifyEnabled: true,
   autoEnabled: true,
@@ -9,53 +9,38 @@ const DEFAULTS = {
   excludeAudible: true,
 };
 
-// ── State ────────────────────────────────────────────────────────────────────
-
 let settings = { ...DEFAULTS };
 let lastSnapshot = null;
 
-// ── Init ─────────────────────────────────────────────────────────────────────
-
 document.addEventListener("DOMContentLoaded", async () => {
-  const stored = await chrome.storage.sync.get(DEFAULTS);
-  settings = stored;
+  settings = await chrome.storage.sync.get(DEFAULTS);
   applySettingsToUI();
   bindEvents();
   await refresh();
-  setRefreshNote();
+  setInterval(refresh, 5000);
+
+  // Fill in your own donation links here:
+  document.getElementById("githubBtn").href = "https://github.com/sponsors/9shift";
+  // document.getElementById("paypalBtn").href = "https://paypal.me/YOUR_PAYPAL_ID";
 });
 
-// ── Navigation ────────────────────────────────────────────────────────────────
-
 function bindEvents() {
-  // Panel nav
   document.querySelectorAll(".tab-nav-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".tab-nav-btn").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      const target = btn.dataset.panel;
-      document.getElementById("panel-monitor").style.display = target === "monitor" ? "block" : "none";
-      document.getElementById("panel-settings").classList.toggle("active", target === "settings");
-      document.getElementById("panel-donate").classList.toggle("active", target === "donate");
-    });
+    btn.addEventListener("click", () => switchPanel(btn.dataset.panel));
   });
-
-  // Header shortcuts
   document.getElementById("btnRefresh").addEventListener("click", refresh);
   document.getElementById("btnSettings").addEventListener("click", () => switchPanel("settings"));
   document.getElementById("btnDonate").addEventListener("click", () => switchPanel("donate"));
 
-  // Threshold slider
-  const slider = document.getElementById("threshSlider");
-  slider.value = settings.thresholdMB;
+  const slider = document.getElementById("idleSlider");
+  slider.value = settings.idleMinutes;
   slider.addEventListener("input", (e) => {
-    settings.thresholdMB = parseInt(e.target.value);
-    document.getElementById("threshDisplay").textContent = formatMB(settings.thresholdMB);
+    settings.idleMinutes = parseInt(e.target.value);
+    document.getElementById("idleDisplay").textContent = formatMin(settings.idleMinutes);
     saveSettings();
-    if (lastSnapshot) renderTabList(lastSnapshot.tabData);
+    if (lastSnapshot) refresh();
   });
 
-  // Action select
   const actionSelect = document.getElementById("actionSelect");
   actionSelect.value = settings.action;
   actionSelect.addEventListener("change", (e) => {
@@ -64,86 +49,64 @@ function bindEvents() {
     updateAutoBanner();
   });
 
-  // Footer buttons
   document.getElementById("btnDiscardAll").addEventListener("click", async () => {
     const btn = document.getElementById("btnDiscardAll");
-    btn.textContent = "처理中…";
-    const res = await chrome.runtime.sendMessage({ type: "DISCARD_OVER_LIMIT" });
-    btn.textContent = `⚡ 已處理 ${res.count} 個`;
-    setTimeout(() => { btn.textContent = "⚡ 處理超限"; refresh(); }, 1500);
+    btn.textContent = "凍結中…";
+    const res = await chrome.runtime.sendMessage({ type: "DISCARD_ALL_BG" });
+    btn.textContent = `⚡ 已凍結 ${res.count} 個`;
+    setTimeout(() => { btn.textContent = "⚡ 凍結全部背景"; refresh(); }, 1500);
   });
 
   document.getElementById("btnDiscardIdle").addEventListener("click", async () => {
     const btn = document.getElementById("btnDiscardIdle");
     btn.textContent = "凍結中…";
-    const res = await chrome.runtime.sendMessage({ type: "DISCARD_IDLE" });
+    const res = await chrome.runtime.sendMessage({ type: "DISCARD_IDLE_NOW" });
     btn.textContent = `❄ 已凍結 ${res.count} 個`;
     setTimeout(() => { btn.textContent = "❄ 凍結閒置"; refresh(); }, 1500);
   });
 
-  // Settings toggles
   bindToggle("settAutoEnabled", "autoEnabled");
   bindToggle("settExcludePinned", "excludePinned");
   bindToggle("settExcludeAudible", "excludeAudible");
   bindToggle("settNotify", "notifyEnabled");
-
-  // 填入你自己的連結（取消註解）：
-  document.getElementById("githubBtn").href = "https://github.com/sponsors/9shift";
-
-
-  // document.getElementById("paypalBtn").href = "https://paypal.me/YOUR_PAYPAL_ID";
 }
 
-function bindToggle(elemId, settingKey) {
+function bindToggle(elemId, key) {
   const el = document.getElementById(elemId);
-  el.checked = settings[settingKey];
+  el.checked = settings[key];
   el.addEventListener("change", () => {
-    settings[settingKey] = el.checked;
+    settings[key] = el.checked;
     saveSettings();
-    if (settingKey === "autoEnabled") updateAutoBanner();
+    if (key === "autoEnabled") updateAutoBanner();
   });
 }
 
 function switchPanel(name) {
-  document.querySelectorAll(".tab-nav-btn").forEach((b) => {
-    b.classList.toggle("active", b.dataset.panel === name);
-  });
+  document.querySelectorAll(".tab-nav-btn").forEach((b) =>
+    b.classList.toggle("active", b.dataset.panel === name));
   document.getElementById("panel-monitor").style.display = name === "monitor" ? "block" : "none";
   document.getElementById("panel-settings").classList.toggle("active", name === "settings");
   document.getElementById("panel-donate").classList.toggle("active", name === "donate");
 }
 
-// ── Data ─────────────────────────────────────────────────────────────────────
-
 async function refresh() {
   try {
-    const snapshot = await chrome.runtime.sendMessage({ type: "GET_TAB_MEMORY" });
-    lastSnapshot = snapshot;
-    renderStats(snapshot);
-    renderTabList(snapshot.tabData);
+    const snap = await chrome.runtime.sendMessage({ type: "GET_TABS" });
+    lastSnapshot = snap;
+    renderStats(snap);
+    renderTabList(snap.tabData);
     updateAutoBanner();
   } catch (e) {
     document.getElementById("tabList").innerHTML =
-      `<div class="empty">無法讀取分頁資料。<br>請確認 Extension 已正確載入。</div>`;
+      `<div class="empty">無法讀取分頁資料</div>`;
   }
 }
 
-function setRefreshNote() {
-  const el = document.getElementById("refreshNote");
-  el.textContent = "每 5 秒自動更新";
-  setInterval(refresh, 5000);
-}
-
-// ── Render ────────────────────────────────────────────────────────────────────
-
-function renderStats({ totalMB, overCount, frozenCount }) {
-  const totalEl = document.getElementById("statTotal");
-  const gb = totalMB / 1024;
-  totalEl.textContent = gb >= 1 ? gb.toFixed(1) + " GB" : totalMB + " MB";
-  totalEl.className = "stat-value " + (totalMB > 2048 ? "danger" : totalMB > 1024 ? "warn" : "ok");
-
-  document.getElementById("statOver").textContent = overCount;
-  document.getElementById("statOver").className = "stat-value " + (overCount > 0 ? "danger" : "ok");
+function renderStats({ activeTabCount, idleCount, frozenCount }) {
+  document.getElementById("statTotal").textContent = activeTabCount;
+  document.getElementById("statTotal").className = "stat-value ok";
+  document.getElementById("statOver").textContent = idleCount;
+  document.getElementById("statOver").className = "stat-value " + (idleCount > 0 ? "warn" : "ok");
   document.getElementById("statFrozen").textContent = frozenCount;
 }
 
@@ -155,38 +118,33 @@ function renderTabList(tabData) {
   }
 
   list.innerHTML = tabData.map((tab) => {
-    const mem = tab.memMB;
-    const cls = tab.discarded ? "frozen"
-      : mem === null ? "ok"
-      : mem >= settings.thresholdMB ? "danger"
-      : mem >= settings.thresholdMB * 0.75 ? "warn"
+    const state = tab.discarded ? "frozen"
+      : tab.active ? "active"
+      : tab.willFreeze ? "danger"
+      : tab.idleMin >= settings.idleMinutes * 0.6 ? "warn"
       : "ok";
-    const rowCls = cls === "danger" ? "is-danger" : cls === "warn" ? "is-warn" : tab.discarded ? "is-frozen" : "";
-    const barPct = mem !== null ? Math.min(100, Math.round((mem / settings.thresholdMB) * 100)) : 0;
+    const rowCls = state === "danger" ? "is-danger" : state === "warn" ? "is-warn" : tab.discarded ? "is-frozen" : "";
 
-    const memDisplay = tab.discarded
-      ? `<span class="mem-text frozen">凍結中</span>`
-      : mem !== null
-        ? `<span class="mem-text ${cls}">${mem} MB</span>`
-        : `<span class="mem-text ok">—</span>`;
-
-    const trend = tab.trend === "rising" ? `<span class="trend" style="color:#f5a623" title="記憶體上升">↑</span>`
-      : tab.trend === "falling" ? `<span class="trend" style="color:#4caf7d" title="記憶體下降">↓</span>`
-      : `<span class="trend"></span>`;
+    const statusText = tab.discarded ? "凍結中"
+      : tab.active ? "使用中"
+      : tab.willFreeze ? "即將凍結"
+      : `閒置 ${formatMin(tab.idleMin)}`;
+    const statusCls = tab.discarded ? "frozen"
+      : tab.active ? "ok"
+      : tab.willFreeze ? "danger"
+      : state === "warn" ? "warn" : "ok";
 
     const pills = [
       tab.pinned ? `<span class="pill pill-pinned">📌</span>` : "",
       tab.audible ? `<span class="pill pill-audible">🔊</span>` : "",
-      tab.discarded ? `<span class="pill pill-frozen">凍結</span>` : "",
     ].join("");
 
     const faviconHtml = tab.favIconUrl
-      ? `<img class="favicon" src="${escHtml(tab.favIconUrl)}" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`
-        + `<div class="favicon-fallback" style="display:none">${getDomainInitial(tab.url)}</div>`
+      ? `<img class="favicon" src="${escHtml(tab.favIconUrl)}" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><div class="favicon-fallback" style="display:none">${getDomainInitial(tab.url)}</div>`
       : `<div class="favicon-fallback">${getDomainInitial(tab.url)}</div>`;
 
     return `
-      <div class="tab-row ${rowCls}" data-id="${tab.id}">
+      <div class="tab-row ${rowCls}">
         ${faviconHtml}
         <div class="tab-info">
           <div class="tab-title" title="${escHtml(tab.title)}">${escHtml(tab.title)}</div>
@@ -195,32 +153,20 @@ function renderTabList(tabData) {
             ${pills}
           </div>
         </div>
-        ${trend}
-        <div class="mem-section">
-          <div class="mem-bar-wrap">
-            <div class="mem-bar ${cls}" style="width:${barPct}%"></div>
-          </div>
-          ${memDisplay}
-        </div>
+        <span class="mem-text ${statusCls}">${statusText}</span>
         <div class="row-actions">
           ${!tab.discarded
-            ? `<button class="row-btn red" data-action="discard" data-id="${tab.id}" title="凍結此分頁">❄</button>`
-            : `<button class="row-btn" data-action="reload" data-id="${tab.id}" title="重新載入（解除凍結）">↻</button>`
-          }
+            ? `<button class="row-btn red" data-action="discard" data-id="${tab.id}" title="立即凍結">❄</button>`
+            : `<button class="row-btn" data-action="reload" data-id="${tab.id}" title="解除凍結">↻</button>`}
         </div>
       </div>`;
   }).join("");
 
-  // Bind row-level actions
   list.querySelectorAll("[data-action]").forEach((btn) => {
-    btn.addEventListener("click", async (e) => {
+    btn.addEventListener("click", async () => {
       const id = parseInt(btn.dataset.id);
-      const action = btn.dataset.action;
-      if (action === "discard") {
-        await chrome.runtime.sendMessage({ type: "DISCARD_TAB", tabId: id });
-      } else if (action === "reload") {
-        await chrome.runtime.sendMessage({ type: "RELOAD_TAB", tabId: id });
-      }
+      const type = btn.dataset.action === "discard" ? "DISCARD_TAB" : "RELOAD_TAB";
+      await chrome.runtime.sendMessage({ type, tabId: id });
       setTimeout(refresh, 600);
     });
   });
@@ -229,47 +175,35 @@ function renderTabList(tabData) {
 function updateAutoBanner() {
   const banner = document.getElementById("autoBanner");
   const label = document.getElementById("autoActionLabel");
-  const actionMap = { discard: "凍結", reload: "重新載入", warn: "通知" };
+  const map = { discard: "凍結", reload: "重新載入", warn: "通知" };
   if (settings.autoEnabled) {
     banner.className = "auto-banner";
-    label.textContent = actionMap[settings.action] || "處理";
+    label.textContent = map[settings.action] || "處理";
   } else {
     banner.className = "auto-banner off";
     banner.textContent = "🔴 自動監控已關閉";
   }
 }
 
-// ── Persist ───────────────────────────────────────────────────────────────────
-
 function applySettingsToUI() {
-  const slider = document.getElementById("threshSlider");
+  const slider = document.getElementById("idleSlider");
   if (slider) {
-    slider.value = settings.thresholdMB;
-    document.getElementById("threshDisplay").textContent = formatMB(settings.thresholdMB);
+    slider.value = settings.idleMinutes;
+    document.getElementById("idleDisplay").textContent = formatMin(settings.idleMinutes);
   }
-  const actionSel = document.getElementById("actionSelect");
-  if (actionSel) actionSel.value = settings.action;
+  const sel = document.getElementById("actionSelect");
+  if (sel) sel.value = settings.action;
 }
 
-function saveSettings() {
-  chrome.storage.sync.set(settings);
-}
+function saveSettings() { chrome.storage.sync.set(settings); }
 
-// ── Utils ─────────────────────────────────────────────────────────────────────
-
-function formatMB(mb) {
-  if (mb >= 1024) return (mb / 1024).toFixed(1) + " GB";
-  return mb + " MB";
+function formatMin(min) {
+  if (min >= 60) {
+    const h = Math.floor(min / 60), m = min % 60;
+    return m > 0 ? `${h}h ${m}m` : `${h} 小時`;
+  }
+  return `${min} 分鐘`;
 }
-
-function getDomain(url) {
-  try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return url; }
-}
-
-function getDomainInitial(url) {
-  try { return new URL(url).hostname.replace(/^www\./, "")[0]?.toUpperCase() || "?"; } catch { return "?"; }
-}
-
-function escHtml(str) {
-  return (str || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
+function getDomain(url) { try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return url; } }
+function getDomainInitial(url) { try { return new URL(url).hostname.replace(/^www\./, "")[0]?.toUpperCase() || "?"; } catch { return "?"; } }
+function escHtml(s) { return (s || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }

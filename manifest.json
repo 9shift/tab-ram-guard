@@ -1,11 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Tab RAM Guard",
-  "version": "1.0.0",
-  "description": "Monitor and control per-tab memory usage. Auto-freeze or reload tabs that exceed your RAM limit.",
+  "version": "2.0.0",
+  "description": "Auto-freeze idle background tabs to save memory. Stop Chrome from creeping up to 3 GB.",
   "permissions": [
     "tabs",
-    "processes",
     "storage",
     "notifications",
     "alarms"

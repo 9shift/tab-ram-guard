@@ -465,11 +465,11 @@
   <!-- Stats -->
   <div class="stats">
     <div class="stat">
-      <span class="stat-label">總記憶體</span>
+      <span class="stat-label">分頁數</span>
       <span class="stat-value" id="statTotal">—</span>
     </div>
     <div class="stat">
-      <span class="stat-label">超限分頁</span>
+      <span class="stat-label">閒置中</span>
       <span class="stat-value danger" id="statOver">—</span>
     </div>
     <div class="stat">
@@ -478,26 +478,26 @@
     </div>
   </div>
 
-  <!-- Threshold -->
+  <!-- Idle threshold -->
   <div class="threshold-section">
     <div class="threshold-header">
-      <span class="threshold-label">⚡ 單分頁記憶體上限</span>
+      <span class="threshold-label">⏱ 背景閒置多久後凍結</span>
       <div class="threshold-controls">
         <select class="action-select" id="actionSelect">
           <option value="discard">自動凍結</option>
           <option value="reload">自動重載</option>
           <option value="warn">僅通知</option>
         </select>
-        <span class="threshold-value" id="threshDisplay">500 MB</span>
+        <span class="threshold-value" id="idleDisplay">30 分鐘</span>
       </div>
     </div>
-    <input type="range" id="threshSlider" min="100" max="2000" step="50" value="500">
-    <div class="range-labels"><span>100 MB</span><span>500 MB</span><span>1 GB</span><span>2 GB</span></div>
+    <input type="range" id="idleSlider" min="5" max="180" step="5" value="30">
+    <div class="range-labels"><span>5分</span><span>30分</span><span>1時</span><span>3時</span></div>
   </div>
 
   <!-- Auto banner -->
   <div class="auto-banner" id="autoBanner">
-    🤖 自動處理已開啟 — 超限分頁將自動被<span id="autoActionLabel">凍結</span>
+    🤖 自動處理已開啟 — 閒置背景分頁將自動被<span id="autoActionLabel">凍結</span>
   </div>
 
   <!-- Tab list -->
@@ -510,7 +510,7 @@
     <span class="refresh-note" id="refreshNote">更新中…</span>
     <div class="footer-actions">
       <button class="btn" id="btnDiscardIdle">❄ 凍結閒置</button>
-      <button class="btn danger" id="btnDiscardAll">⚡ 處理超限</button>
+      <button class="btn danger" id="btnDiscardAll">⚡ 凍結全部背景</button>
     </div>
   </div>
 
