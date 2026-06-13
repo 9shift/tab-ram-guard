@@ -4,17 +4,34 @@
 
 const CHECK_INTERVAL_MIN = 1; // check every 1 minute
 const DEFAULTS = {
-  idleMinutes: 30,        // freeze background tabs idle longer than this
+  idleMinutes: 30,        // default freeze time for background tabs
   action: "discard",      // "discard" | "reload" | "warn"
   notifyEnabled: true,
   autoEnabled: true,
   excludePinned: true,
   excludeAudible: true,
+  siteRules: [],          // [{ domain: "youtube.com", minutes: 10 }, ...]
 };
 
 let settings = { ...DEFAULTS };
 let lastActive = {};      // tabId -> timestamp of last time it was active
 let lastNotified = {};    // tabId -> timestamp, throttle notifications
+
+// Return the idle-minutes threshold that applies to a given URL.
+// Site rules override the default; longest matching domain wins.
+function thresholdFor(url) {
+  if (!settings.siteRules || !settings.siteRules.length) return settings.idleMinutes;
+  let host = "";
+  try { host = new URL(url).hostname.replace(/^www\./, ""); } catch { return settings.idleMinutes; }
+  let best = null;
+  for (const rule of settings.siteRules) {
+    const d = rule.domain.replace(/^www\./, "").toLowerCase();
+    if (host === d || host.endsWith("." + d)) {
+      if (!best || d.length > best.domain.length) best = rule;
+    }
+  }
+  return best ? best.minutes : settings.idleMinutes;
+}
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 
@@ -133,7 +150,8 @@ async function getTabsSnapshot() {
       discarded: tab.discarded,
       active: tab.active,
       idleMin,
-      willFreeze: !tab.active && !tab.discarded && idleMin >= settings.idleMinutes
+      threshold: thresholdFor(tab.url || ""),
+      willFreeze: !tab.active && !tab.discarded && idleMin >= thresholdFor(tab.url || "")
         && !(settings.excludePinned && tab.pinned)
         && !(settings.excludeAudible && tab.audible),
     };
@@ -147,7 +165,7 @@ async function getTabsSnapshot() {
 
   const frozenCount = tabData.filter((t) => t.discarded).length;
   const activeTabCount = tabData.filter((t) => !t.discarded).length;
-  const idleCount = tabData.filter((t) => !t.discarded && !t.active && t.idleMin >= settings.idleMinutes).length;
+  const idleCount = tabData.filter((t) => !t.discarded && !t.active && t.idleMin >= t.threshold).length;
 
   return { tabData, frozenCount, activeTabCount, idleCount, settings };
 }
@@ -166,7 +184,7 @@ async function checkIdle() {
 
     const seenAt = lastActive[tab.id] || now;
     const idleMin = (now - seenAt) / 60000;
-    if (idleMin < settings.idleMinutes) continue;
+    if (idleMin < thresholdFor(tab.url || "")) continue;
 
     if (settings.action === "discard") {
       chrome.tabs.discard(tab.id);
@@ -207,7 +225,7 @@ async function discardIdleNow() {
     if (settings.excludePinned && tab.pinned) continue;
     if (settings.excludeAudible && tab.audible) continue;
     const idleMin = (now - (lastActive[tab.id] || now)) / 60000;
-    if (idleMin >= settings.idleMinutes) {
+    if (idleMin >= thresholdFor(tab.url || "")) {
       chrome.tabs.discard(tab.id);
       count++;
     }

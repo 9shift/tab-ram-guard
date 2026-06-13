@@ -320,6 +320,23 @@
   /* ── Settings panel ── */
   .settings-panel { padding: 14px; display: none; }
   .settings-panel.active { display: block; }
+  .rules-section { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .rules-header { margin-bottom: 10px; }
+  .rules-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+  .rule-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+  .rule-domain { flex: 1; font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rule-time { font-size: 11px; font-weight: 600; color: var(--warn); white-space: nowrap; }
+  .rule-del { background: transparent; border: none; color: var(--text3); cursor: pointer; font-size: 14px; padding: 0 2px; line-height: 1; }
+  .rule-del:hover { color: var(--danger); }
+  .rules-empty { font-size: 11px; color: var(--text3); text-align: center; padding: 10px 0; }
+  .rules-add-row { display: flex; align-items: center; gap: 6px; }
+  .rule-input { flex: 1; min-width: 0; font-size: 12px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); padding: 6px 8px; outline: none; }
+  .rule-input:focus { border-color: var(--accent); }
+  .rule-input-min { width: 48px; font-size: 12px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); padding: 6px 6px; outline: none; text-align: center; }
+  .rule-min-unit { font-size: 11px; color: var(--text3); white-space: nowrap; }
+  .rule-add-btn { font-size: 12px; padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--accent); background: var(--accent-dim); color: var(--accent); cursor: pointer; white-space: nowrap; }
+  .rule-add-btn:hover { background: var(--accent); color: white; }
+  .rules-default-note { font-size: 10px; color: var(--text3); margin-top: 8px; text-align: center; }
   .setting-row {
     display: flex;
     align-items: center;
@@ -548,6 +565,21 @@
       <div class="setting-sub" data-i18n="set_notify_sub">凍結分頁時發送系統通知</div>
     </div>
     <label class="toggle"><input type="checkbox" id="settNotify" checked><span class="toggle-slider"></span></label>
+  </div>
+
+  <div class="rules-section">
+    <div class="rules-header">
+      <div class="setting-label" data-i18n="rules_title">個別網站規則</div>
+      <div class="setting-sub" data-i18n="rules_sub">這些網站用自己的時間凍結</div>
+    </div>
+    <div class="rules-list" id="rulesList"></div>
+    <div class="rules-add-row">
+      <input type="text" id="ruleDomain" class="rule-input" data-i18n-ph="rules_domain_ph" placeholder="例如 youtube.com">
+      <input type="number" id="ruleMin" class="rule-input-min" min="1" max="180" value="10">
+      <span class="rule-min-unit" data-i18n="rules_min_ph">分鐘</span>
+      <button class="rule-add-btn" id="ruleAddBtn" data-i18n="rules_add">新增</button>
+    </div>
+    <div class="rules-default-note" id="rulesDefaultNote" data-i18n="rules_default_note">其他網站使用上方的預設時間</div>
   </div>
 </div>
 

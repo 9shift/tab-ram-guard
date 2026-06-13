@@ -8,6 +8,7 @@ const DEFAULTS = {
   autoEnabled: true,
   excludePinned: true,
   excludeAudible: true,
+  siteRules: [],
 };
 
 let settings = { ...DEFAULTS };
@@ -19,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   buildLangSelector();
   applyI18n();
   applySettingsToUI();
+  renderRules();
   bindEvents();
   await refresh();
   setInterval(refresh, 5000);
@@ -41,6 +43,7 @@ function buildLangSelector() {
     setLang(settings.lang);  // switch active translation table
     applyI18n();             // re-translate static UI
     applySettingsToUI();     // re-render slider label units
+    renderRules();           // re-translate rule rows
     refresh();               // re-render tab list with new language
   });
 }
@@ -50,6 +53,10 @@ function applyI18n() {
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.dataset.i18n;
     if (T[key]) el.textContent = T[key];
+  });
+  document.querySelectorAll("[data-i18n-ph]").forEach((el) => {
+    const key = el.dataset.i18nPh;
+    if (T[key]) el.placeholder = T[key];
   });
   const desc = document.getElementById("donateDesc");
   if (desc) desc.innerHTML = T.donate_desc;
@@ -104,6 +111,63 @@ function bindEvents() {
   bindToggle("settExcludePinned", "excludePinned");
   bindToggle("settExcludeAudible", "excludeAudible");
   bindToggle("settNotify", "notifyEnabled");
+
+  // Add-rule button + Enter key on domain field
+  document.getElementById("ruleAddBtn").addEventListener("click", addRule);
+  document.getElementById("ruleDomain").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") addRule();
+  });
+}
+
+// ── Per-site rules ──────────────────────────────────────────────────────────
+
+function renderRules() {
+  const list = document.getElementById("rulesList");
+  const rules = settings.siteRules || [];
+  if (rules.length === 0) {
+    list.innerHTML = `<div class="rules-empty">${T.rules_empty}</div>`;
+    return;
+  }
+  list.innerHTML = rules.map((r, i) => `
+    <div class="rule-item">
+      <span class="rule-domain">${escHtml(r.domain)}</span>
+      <span class="rule-time">${r.minutes} ${T.min}</span>
+      <button class="rule-del" data-idx="${i}" title="${T.title_unfreeze}">✕</button>
+    </div>`).join("");
+
+  list.querySelectorAll(".rule-del").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const idx = parseInt(btn.dataset.idx);
+      settings.siteRules.splice(idx, 1);
+      saveSettings();
+      renderRules();
+      refresh();
+    });
+  });
+}
+
+function addRule() {
+  const domainInput = document.getElementById("ruleDomain");
+  const minInput = document.getElementById("ruleMin");
+  let domain = (domainInput.value || "").trim().toLowerCase();
+  // Clean up: strip protocol, paths, www
+  domain = domain.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0].trim();
+  const minutes = Math.max(1, Math.min(180, parseInt(minInput.value) || 10));
+  if (!domain || !domain.includes(".")) {
+    domainInput.style.borderColor = "var(--danger)";
+    setTimeout(() => { domainInput.style.borderColor = ""; }, 1200);
+    return;
+  }
+  if (!settings.siteRules) settings.siteRules = [];
+  // Replace if domain already exists
+  const existing = settings.siteRules.findIndex((r) => r.domain === domain);
+  if (existing >= 0) settings.siteRules[existing].minutes = minutes;
+  else settings.siteRules.push({ domain, minutes });
+  saveSettings();
+  domainInput.value = "";
+  minInput.value = "10";
+  renderRules();
+  refresh();
 }
 
 function bindToggle(elemId, key) {

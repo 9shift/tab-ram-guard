@@ -4,7 +4,7 @@
 
 const I18N = {
   en: {
-    nav_monitor: "Monitor", nav_settings: "Settings", nav_donate: "Support", set_lang: "Language", donate_recommended: "Recommended", donate_venmo_sub: "US users",
+    nav_monitor: "Monitor", nav_settings: "Settings", nav_donate: "Support", set_lang: "Language", donate_recommended: "Recommended", donate_venmo_sub: "US users", rules_title: "Per-site rules", rules_sub: "These sites freeze on their own timer", rules_add: "Add", rules_domain_ph: "e.g. youtube.com", rules_min_ph: "min", rules_empty: "No rules yet — add a site below", rules_default_note: "All other sites use the default above",
     stat_tabs: "Tabs", stat_idle: "Idle", stat_frozen: "Frozen",
     idle_label: "Freeze background tabs after",
     act_discard: "Auto-freeze", act_reload: "Auto-reload", act_warn: "Notify only",
@@ -27,7 +27,7 @@ const I18N = {
     freezing: "Freezing…", frozen_n: "Frozen",
   },
   "zh-TW": {
-    nav_monitor: "監控", nav_settings: "設定", nav_donate: "支持", set_lang: "語言", donate_recommended: "推薦", donate_venmo_sub: "美國用戶適用",
+    nav_monitor: "監控", nav_settings: "設定", nav_donate: "支持", set_lang: "語言", donate_recommended: "推薦", donate_venmo_sub: "美國用戶適用", rules_title: "個別網站規則", rules_sub: "這些網站用自己的時間凍結", rules_add: "新增", rules_domain_ph: "例如 youtube.com", rules_min_ph: "分鐘", rules_empty: "尚無規則 — 在下方新增網站", rules_default_note: "其他網站使用上方的預設時間",
     stat_tabs: "分頁數", stat_idle: "閒置中", stat_frozen: "已凍結",
     idle_label: "背景閒置多久後凍結",
     act_discard: "自動凍結", act_reload: "自動重載", act_warn: "僅通知",
@@ -50,7 +50,7 @@ const I18N = {
     freezing: "凍結中…", frozen_n: "已凍結",
   },
   "zh-CN": {
-    nav_monitor: "监控", nav_settings: "设置", nav_donate: "支持", set_lang: "语言", donate_recommended: "推荐", donate_venmo_sub: "美国用户适用",
+    nav_monitor: "监控", nav_settings: "设置", nav_donate: "支持", set_lang: "语言", donate_recommended: "推荐", donate_venmo_sub: "美国用户适用", rules_title: "单个网站规则", rules_sub: "这些网站用自己的时间冻结", rules_add: "添加", rules_domain_ph: "例如 youtube.com", rules_min_ph: "分钟", rules_empty: "暂无规则 — 在下方添加网站", rules_default_note: "其他网站使用上方的默认时间",
     stat_tabs: "标签页", stat_idle: "闲置中", stat_frozen: "已冻结",
     idle_label: "后台闲置多久后冻结",
     act_discard: "自动冻结", act_reload: "自动重载", act_warn: "仅通知",
@@ -73,7 +73,7 @@ const I18N = {
     freezing: "冻结中…", frozen_n: "已冻结",
   },
   ja: {
-    nav_monitor: "モニター", nav_settings: "設定", nav_donate: "支援", set_lang: "言語", donate_recommended: "おすすめ", donate_venmo_sub: "米国ユーザー向け",
+    nav_monitor: "モニター", nav_settings: "設定", nav_donate: "支援", set_lang: "言語", donate_recommended: "おすすめ", donate_venmo_sub: "米国ユーザー向け", rules_title: "サイト別ルール", rules_sub: "これらのサイトは独自の時間で凍結", rules_add: "追加", rules_domain_ph: "例: youtube.com", rules_min_ph: "分", rules_empty: "ルールなし — 下でサイトを追加", rules_default_note: "他のサイトは上記の既定値を使用",
     stat_tabs: "タブ数", stat_idle: "アイドル", stat_frozen: "凍結済み",
     idle_label: "バックグラウンドのアイドル時間で凍結",
     act_discard: "自動凍結", act_reload: "自動再読込", act_warn: "通知のみ",
@@ -96,7 +96,7 @@ const I18N = {
     freezing: "凍結中…", frozen_n: "凍結しました",
   },
   ko: {
-    nav_monitor: "모니터", nav_settings: "설정", nav_donate: "후원", set_lang: "언어", donate_recommended: "추천", donate_venmo_sub: "미국 사용자용",
+    nav_monitor: "모니터", nav_settings: "설정", nav_donate: "후원", set_lang: "언어", donate_recommended: "추천", donate_venmo_sub: "미국 사용자용", rules_title: "사이트별 규칙", rules_sub: "이 사이트는 자체 시간으로 동결", rules_add: "추가", rules_domain_ph: "예: youtube.com", rules_min_ph: "분", rules_empty: "규칙 없음 — 아래에서 사이트 추가", rules_default_note: "다른 사이트는 위 기본값 사용",
     stat_tabs: "탭 수", stat_idle: "유휴", stat_frozen: "동결됨",
     idle_label: "백그라운드 유휴 시간 후 동결",
     act_discard: "자동 동결", act_reload: "자동 새로고침", act_warn: "알림만",
@@ -119,7 +119,7 @@ const I18N = {
     freezing: "동결 중…", frozen_n: "동결됨",
   },
   es: {
-    nav_monitor: "Monitor", nav_settings: "Ajustes", nav_donate: "Apoyar", set_lang: "Idioma", donate_recommended: "Recomendado", donate_venmo_sub: "Usuarios de EE. UU.",
+    nav_monitor: "Monitor", nav_settings: "Ajustes", nav_donate: "Apoyar", set_lang: "Idioma", donate_recommended: "Recomendado", donate_venmo_sub: "Usuarios de EE. UU.", rules_title: "Reglas por sitio", rules_sub: "Estos sitios se congelan con su propio tiempo", rules_add: "Añadir", rules_domain_ph: "ej. youtube.com", rules_min_ph: "min", rules_empty: "Sin reglas — añade un sitio abajo", rules_default_note: "Los demás sitios usan el valor predeterminado",
     stat_tabs: "Pestañas", stat_idle: "Inactivas", stat_frozen: "Congeladas",
     idle_label: "Congelar pestañas inactivas tras",
     act_discard: "Auto-congelar", act_reload: "Auto-recargar", act_warn: "Solo avisar",
@@ -142,7 +142,7 @@ const I18N = {
     freezing: "Congelando…", frozen_n: "Congeladas",
   },
   fr: {
-    nav_monitor: "Moniteur", nav_settings: "Réglages", nav_donate: "Soutenir", set_lang: "Langue", donate_recommended: "Recommandé", donate_venmo_sub: "Utilisateurs US",
+    nav_monitor: "Moniteur", nav_settings: "Réglages", nav_donate: "Soutenir", set_lang: "Langue", donate_recommended: "Recommandé", donate_venmo_sub: "Utilisateurs US", rules_title: "Règles par site", rules_sub: "Ces sites se gèlent selon leur propre délai", rules_add: "Ajouter", rules_domain_ph: "ex. youtube.com", rules_min_ph: "min", rules_empty: "Aucune règle — ajoutez un site ci-dessous", rules_default_note: "Les autres sites utilisent la valeur par défaut",
     stat_tabs: "Onglets", stat_idle: "Inactifs", stat_frozen: "Gelés",
     idle_label: "Geler les onglets inactifs après",
     act_discard: "Geler auto", act_reload: "Recharger auto", act_warn: "Notifier seul.",
@@ -165,7 +165,7 @@ const I18N = {
     freezing: "Gel en cours…", frozen_n: "Gelés",
   },
   de: {
-    nav_monitor: "Monitor", nav_settings: "Einstellungen", nav_donate: "Unterstützen", set_lang: "Sprache", donate_recommended: "Empfohlen", donate_venmo_sub: "US-Nutzer",
+    nav_monitor: "Monitor", nav_settings: "Einstellungen", nav_donate: "Unterstützen", set_lang: "Sprache", donate_recommended: "Empfohlen", donate_venmo_sub: "US-Nutzer", rules_title: "Regeln pro Website", rules_sub: "Diese Seiten frieren nach eigenem Timer ein", rules_add: "Hinzufügen", rules_domain_ph: "z. B. youtube.com", rules_min_ph: "Min", rules_empty: "Noch keine Regeln — unten Seite hinzufügen", rules_default_note: "Alle anderen Seiten nutzen den Standardwert",
     stat_tabs: "Tabs", stat_idle: "Inaktiv", stat_frozen: "Eingefroren",
     idle_label: "Inaktive Tabs einfrieren nach",
     act_discard: "Auto-einfrieren", act_reload: "Auto-neuladen", act_warn: "Nur melden",
@@ -188,7 +188,7 @@ const I18N = {
     freezing: "Einfrieren…", frozen_n: "Eingefroren",
   },
   pt: {
-    nav_monitor: "Monitor", nav_settings: "Ajustes", nav_donate: "Apoiar", set_lang: "Idioma", donate_recommended: "Recomendado", donate_venmo_sub: "Usuários dos EUA",
+    nav_monitor: "Monitor", nav_settings: "Ajustes", nav_donate: "Apoiar", set_lang: "Idioma", donate_recommended: "Recomendado", donate_venmo_sub: "Usuários dos EUA", rules_title: "Regras por site", rules_sub: "Estes sites congelam com seu próprio tempo", rules_add: "Adicionar", rules_domain_ph: "ex. youtube.com", rules_min_ph: "min", rules_empty: "Sem regras — adicione um site abaixo", rules_default_note: "Os outros sites usam o padrão acima",
     stat_tabs: "Abas", stat_idle: "Ociosas", stat_frozen: "Congeladas",
     idle_label: "Congelar abas ociosas após",
     act_discard: "Auto-congelar", act_reload: "Auto-recarregar", act_warn: "Só avisar",
@@ -211,7 +211,7 @@ const I18N = {
     freezing: "Congelando…", frozen_n: "Congeladas",
   },
   ru: {
-    nav_monitor: "Монитор", nav_settings: "Настройки", nav_donate: "Поддержать", set_lang: "Язык", donate_recommended: "Рекомендуется", donate_venmo_sub: "Для пользователей США",
+    nav_monitor: "Монитор", nav_settings: "Настройки", nav_donate: "Поддержать", set_lang: "Язык", donate_recommended: "Рекомендуется", donate_venmo_sub: "Для пользователей США", rules_title: "Правила по сайтам", rules_sub: "Эти сайты замораживаются по своему таймеру", rules_add: "Добавить", rules_domain_ph: "напр. youtube.com", rules_min_ph: "мин", rules_empty: "Правил нет — добавьте сайт ниже", rules_default_note: "Остальные сайты используют значение по умолчанию",
     stat_tabs: "Вкладки", stat_idle: "Простой", stat_frozen: "Заморожено",
     idle_label: "Замораживать вкладки после простоя",
     act_discard: "Авто-заморозка", act_reload: "Авто-перезагрузка", act_warn: "Только уведомлять",
