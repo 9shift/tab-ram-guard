@@ -1,32 +1,4 @@
 {
-  "manifest_version": 3,
-  "name": "__MSG_extName__",
-  "version": "2.4.0",
-  "default_locale": "en",
-  "description": "__MSG_extDesc__",
-  "permissions": [
-    "tabs",
-    "storage",
-    "notifications",
-    "alarms"
-  ],
-  "action": {
-    "default_popup": "popup.html",
-    "default_title": "Tab RAM Guard",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "32": "icons/icon32.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
-  },
-  "background": {
-    "service_worker": "background.js"
-  },
-  "icons": {
-    "16": "icons/icon16.png",
-    "32": "icons/icon32.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  }
+  "extName": { "message": "Tab RAM Guard" },
+  "extDesc": { "message": "Congela automaticamente abas ociosas para economizar memória." }
 }
