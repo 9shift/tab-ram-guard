@@ -1,4 +1,11 @@
 {
-  "extName": { "message": "标签页内存卫士" },
-  "extDesc": { "message": "自动冻结闲置的后台标签页以节省内存，避免 Chrome 内存不断攀升。" }
+  "extName": { "message": "tab-ram-guard" },
+  "extDesc": { "message": "KEY FEATURES
+• Auto-freeze idle background tabs (5 min – 3 hr, your choice)
+• Per-site rules — set shorter freeze times for memory-heavy sites
+• Live tab list showing active, idle, and about-to-freeze tabs
+• Bulk actions — freeze all idle or all background tabs at once
+• Smart exclusions — never freezes pinned tabs or tabs playing audio
+• Optional desktop notifications
+• Available in 10 languages, auto-detected from your browser" }
 }
