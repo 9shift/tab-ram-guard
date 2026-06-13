@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tab RAM Guard</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --bg2: #1a1a1d;
+    --bg3: #242428;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0f0f0;
+    --text2: #909098;
+    --text3: #606068;
+    --accent: #6c63ff;
+    --accent-dim: rgba(108,99,255,0.15);
+    --warn: #f5a623;
+    --warn-dim: rgba(245,166,35,0.12);
+    --danger: #e85d5d;
+    --danger-dim: rgba(232,93,93,0.12);
+    --ok: #4caf7d;
+    --ok-dim: rgba(76,175,125,0.12);
+    --frozen: #5a9cf5;
+    --frozen-dim: rgba(90,156,245,0.1);
+    --radius: 8px;
+    --radius-sm: 5px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 400px;
+    min-height: 200px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.2px;
+  }
+  .logo-icon {
+    width: 24px; height: 24px;
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .header-actions { display: flex; gap: 6px; align-items: center; }
+  .icon-btn {
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--text2);
+    cursor: pointer;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+  .badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 99px;
+    font-weight: 500;
+  }
+
+  /* ── Tabs nav ── */
+  .tabs-nav {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .tab-nav-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text2);
+    padding: 9px 0 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .tab-nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-nav-btn:hover:not(.active) { color: var(--text); }
+
+  /* ── Stats row ── */
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat {
+    background: var(--bg);
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
+  .stat-value.ok { color: var(--ok); }
+  .stat-value.warn { color: var(--warn); }
+  .stat-value.danger { color: var(--danger); }
+  .stat-value.frozen { color: var(--frozen); }
+
+  /* ── Threshold bar ── */
+  .threshold-section {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+  .threshold-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .threshold-label { font-size: 11px; color: var(--text2); font-weight: 500; }
+  .threshold-controls { display: flex; gap: 6px; align-items: center; }
+  .threshold-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--warn);
+    min-width: 60px;
+    text-align: right;
+  }
+  .action-select {
+    font-size: 11px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 3px 7px;
+    cursor: pointer;
+    outline: none;
+  }
+  input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 2px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid var(--bg);
+  }
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text3);
+    margin-top: 4px;
+  }
+
+  /* ── Tab list ── */
+  .tab-list { max-height: 280px; overflow-y: auto; }
+  .tab-list::-webkit-scrollbar { width: 4px; }
+  .tab-list::-webkit-scrollbar-track { background: transparent; }
+  .tab-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  .tab-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+    position: relative;
+  }
+  .tab-row:hover { background: var(--bg2); }
+  .tab-row.is-danger { background: var(--danger-dim); }
+  .tab-row.is-danger:hover { background: rgba(232,93,93,0.2); }
+  .tab-row.is-warn { background: var(--warn-dim); }
+  .tab-row.is-frozen { opacity: 0.6; }
+
+  .favicon {
+    width: 16px; height: 16px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    object-fit: contain;
+  }
+  .favicon-fallback {
+    width: 16px; height: 16px;
+    border-radius: 3px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    color: var(--text3);
+    flex-shrink: 0;
+  }
+  .tab-info { flex: 1; min-width: 0; }
+  .tab-title {
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 195px;
+  }
+  .tab-meta {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    margin-top: 1px;
+  }
+  .tab-url {
+    font-size: 10px;
+    color: var(--text3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+  }
+  .pill {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 99px;
+    font-weight: 600;
+    flex-shrink: 0;
+    letter-spacing: 0.2px;
+  }
+  .pill-pinned { background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); }
+  .pill-audible { background: var(--ok-dim); color: var(--ok); }
+  .pill-frozen { background: var(--frozen-dim); color: var(--frozen); }
+
+  .mem-section {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .mem-bar-wrap { width: 40px; height: 3px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+  .mem-bar { height: 100%; border-radius: 2px; transition: width 0.3s; }
+  .mem-bar.ok { background: var(--ok); }
+  .mem-bar.warn { background: var(--warn); }
+  .mem-bar.danger { background: var(--danger); }
+
+  .mem-text { font-size: 11px; font-weight: 600; min-width: 54px; text-align: right; }
+  .mem-text.ok { color: var(--text2); }
+  .mem-text.warn { color: var(--warn); }
+  .mem-text.danger { color: var(--danger); }
+  .mem-text.frozen { color: var(--text3); font-weight: 400; }
+  .trend { font-size: 10px; width: 12px; text-align: center; flex-shrink: 0; }
+
+  .row-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .row-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text3);
+    cursor: pointer;
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    transition: all 0.15s;
+  }
+  .row-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+  .row-btn.red:hover { background: var(--danger-dim); color: var(--danger); border-color: var(--danger); }
+
+  /* ── Footer ── */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+  }
+  .refresh-note { font-size: 10px; color: var(--text3); }
+  .footer-actions { display: flex; gap: 6px; }
+  .btn {
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 4px;
+    font-weight: 500;
+  }
+  .btn:hover { background: var(--bg3); color: var(--text); }
+  .btn.danger { border-color: var(--danger); color: var(--danger); }
+  .btn.danger:hover { background: var(--danger-dim); }
+  .btn.accent { border-color: var(--accent); color: var(--accent); }
+  .btn.accent:hover { background: var(--accent-dim); }
+
+  /* ── Settings panel ── */
+  .settings-panel { padding: 14px; display: none; }
+  .settings-panel.active { display: block; }
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-label { font-size: 12px; color: var(--text); }
+  .setting-sub { font-size: 10px; color: var(--text3); margin-top: 1px; }
+  .toggle {
+    position: relative;
+    width: 36px; height: 20px;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 99px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--text3);
+    left: 2px; top: 2px;
+    transition: 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(16px); background: white; }
+
+  /* ── Donate panel ── */
+  .donate-panel { padding: 0; display: none; }
+  .donate-panel.active { display: block; }
+  .donate-hero {
+    padding: 20px 16px 16px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .donate-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .donate-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .donate-desc { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .donate-options { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .donate-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    width: 100%;
+  }
+  .donate-btn:hover { background: var(--bg3); border-color: var(--accent); }
+  .donate-btn-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .donate-btn-text { display: flex; flex-direction: column; gap: 1px; }
+  .donate-btn-label { font-size: 13px; font-weight: 500; }
+  .donate-btn-sub { font-size: 10px; color: var(--text2); }
+  .github-sp { background: rgba(139,92,246,0.15); }
+  .ko-fi { background: rgba(255,94,91,0.12); }
+  .venmo { background: rgba(0,163,176,0.12); }
+  .paypal { background: rgba(0,112,186,0.12); }
+  .donate-footer {
+    padding: 10px 14px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--text3);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Empty state ── */
+  .empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--text3);
+    font-size: 12px;
+  }
+  .loading { padding: 20px; text-align: center; color: var(--text3); font-size: 12px; }
+
+  /* ── Auto-action toggl banner ── */
+  .auto-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 14px;
+    background: var(--accent-dim);
+    border-bottom: 1px solid rgba(108,99,255,0.25);
+    font-size: 11px;
+    color: var(--accent);
+  }
+  .auto-banner.off {
+    background: var(--bg2);
+    color: var(--text3);
+    border-bottom-color: var(--border);
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🛡</div>
+    Tab RAM Guard
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="btnRefresh" title="重新整理">↻</button>
+    <button class="icon-btn" id="btnSettings" title="設定">⚙</button>
+    <button class="icon-btn" id="btnDonate" title="支持開發者">♥</button>
+  </div>
+</div>
+
+<!-- Tab nav -->
+<div class="tabs-nav">
+  <button class="tab-nav-btn active" data-panel="monitor">監控</button>
+  <button class="tab-nav-btn" data-panel="settings">設定</button>
+  <button class="tab-nav-btn" data-panel="donate">支持</button>
+</div>
+
+<!-- ── Monitor panel ── -->
+<div id="panel-monitor">
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-label">總記憶體</span>
+      <span class="stat-value" id="statTotal">—</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">超限分頁</span>
+      <span class="stat-value danger" id="statOver">—</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">已凍結</span>
+      <span class="stat-value frozen" id="statFrozen">—</span>
+    </div>
+  </div>
+
+  <!-- Threshold -->
+  <div class="threshold-section">
+    <div class="threshold-header">
+      <span class="threshold-label">⚡ 單分頁記憶體上限</span>
+      <div class="threshold-controls">
+        <select class="action-select" id="actionSelect">
+          <option value="discard">自動凍結</option>
+          <option value="reload">自動重載</option>
+          <option value="warn">僅通知</option>
+        </select>
+        <span class="threshold-value" id="threshDisplay">500 MB</span>
+      </div>
+    </div>
+    <input type="range" id="threshSlider" min="100" max="2000" step="50" value="500">
+    <div class="range-labels"><span>100 MB</span><span>500 MB</span><span>1 GB</span><span>2 GB</span></div>
+  </div>
+
+  <!-- Auto banner -->
+  <div class="auto-banner" id="autoBanner">
+    🤖 自動處理已開啟 — 超限分頁將自動被<span id="autoActionLabel">凍結</span>
+  </div>
+
+  <!-- Tab list -->
+  <div class="tab-list" id="tabList">
+    <div class="loading">讀取分頁資料…</div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span class="refresh-note" id="refreshNote">更新中…</span>
+    <div class="footer-actions">
+      <button class="btn" id="btnDiscardIdle">❄ 凍結閒置</button>
+      <button class="btn danger" id="btnDiscardAll">⚡ 處理超限</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Settings panel ── -->
+<div id="panel-settings" class="settings-panel">
+  <div class="setting-row">
+    <div>
+      <div class="setting-label">自動監控</div>
+      <div class="setting-sub">背景自動偵測並處理超限分頁</div>
+    </div>
+    <label class="toggle"><input type="checkbox" id="settAutoEnabled" checked><span class="toggle-slider"></span></label>
+  </div>
+  <div class="setting-row">
+    <div>
+      <div class="setting-label">排除釘選分頁</div>
+      <div class="setting-sub">已釘選的分頁不自動處理</div>
+    </div>
+    <label class="toggle"><input type="checkbox" id="settExcludePinned" checked><span class="toggle-slider"></span></label>
+  </div>
+  <div class="setting-row">
+    <div>
+      <div class="setting-label">排除播放中分頁</div>
+      <div class="setting-sub">正在播放聲音的分頁不自動處理</div>
+    </div>
+    <label class="toggle"><input type="checkbox" id="settExcludeAudible" checked><span class="toggle-slider"></span></label>
+  </div>
+  <div class="setting-row">
+    <div>
+      <div class="setting-label">桌面通知</div>
+      <div class="setting-sub">超限時發送系統通知</div>
+    </div>
+    <label class="toggle"><input type="checkbox" id="settNotify" checked><span class="toggle-slider"></span></label>
+  </div>
+</div>
+
+<!-- ── Donate panel ── -->
+<div id="panel-donate" class="donate-panel">
+  <div class="donate-hero">
+    <span class="donate-icon">🛡️</span>
+    <div class="donate-title">喜歡這個工具嗎？</div>
+    <div class="donate-desc">
+      Tab RAM Guard 完全免費，沒有追蹤、沒有廣告。<br>
+      如果幫你省下了崩潰的煩惱，請考慮支持開發 ☕
+    </div>
+  </div>
+  <div class="donate-options">
+    <a href="https://github.com/sponsors/9shift" target="_blank" class="donate-btn" id="githubBtn">
+      <div class="donate-btn-icon github-sp" style="font-size:18px">★</div>
+      <div class="donate-btn-text">
+        <span class="donate-btn-label">GitHub Sponsors</span>
+        <span class="donate-btn-sub">0% 手續費 · 月訂閱或一次性 · 全球</span>
+      </div>
+      <span style="font-size:10px;color:var(--text3);margin-left:auto;flex-shrink:0">推薦</span>
+    </a>
+    <a href="https://ko-fi.com/YOUR_KOFI_ID" target="_blank" class="donate-btn" id="kofiBtn">
+      <div class="donate-btn-icon ko-fi">☕</div>
+      <div class="donate-btn-text">
+        <span class="donate-btn-label">Ko-fi 請喝咖啡</span>
+        <span class="donate-btn-sub">0% 手續費 · 信用卡 / PayPal · 全球</span>
+      </div>
+    </a>
+    <a href="https://venmo.com/YOUR_VENMO_ID" target="_blank" class="donate-btn" id="venmoBtn">
+      <div class="donate-btn-icon venmo" style="font-size:13px;font-weight:700;color:#00a3b0">V</div>
+      <div class="donate-btn-text">
+        <span class="donate-btn-label">Venmo</span>
+        <span class="donate-btn-sub">美國用戶適用</span>
+      </div>
+    </a>
+    <a href="https://paypal.me/YOUR_PAYPAL_ID" target="_blank" class="donate-btn" id="paypalBtn">
+      <div class="donate-btn-icon paypal" style="font-size:13px;font-weight:700;color:#0070ba">P</div>
+      <div class="donate-btn-text">
+        <span class="donate-btn-label">PayPal</span>
+        <span class="donate-btn-sub">全球通用 · paypal.me</span>
+      </div>
+    </a>
+  </div>
+  <div class="donate-footer">感謝每一位支持者 💜 — 你的支持讓這個專案持續維護</div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
