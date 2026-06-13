@@ -4,7 +4,7 @@
 
 const I18N = {
   en: {
-    nav_monitor: "Monitor", nav_settings: "Settings", nav_donate: "Support",
+    nav_monitor: "Monitor", nav_settings: "Settings", nav_donate: "Support", set_lang: "Language", donate_recommended: "Recommended", donate_venmo_sub: "US users",
     stat_tabs: "Tabs", stat_idle: "Idle", stat_frozen: "Frozen",
     idle_label: "Freeze background tabs after",
     act_discard: "Auto-freeze", act_reload: "Auto-reload", act_warn: "Notify only",
@@ -27,7 +27,7 @@ const I18N = {
     freezing: "Freezing…", frozen_n: "Frozen",
   },
   "zh-TW": {
-    nav_monitor: "監控", nav_settings: "設定", nav_donate: "支持",
+    nav_monitor: "監控", nav_settings: "設定", nav_donate: "支持", set_lang: "語言", donate_recommended: "推薦", donate_venmo_sub: "美國用戶適用",
     stat_tabs: "分頁數", stat_idle: "閒置中", stat_frozen: "已凍結",
     idle_label: "背景閒置多久後凍結",
     act_discard: "自動凍結", act_reload: "自動重載", act_warn: "僅通知",
@@ -50,7 +50,7 @@ const I18N = {
     freezing: "凍結中…", frozen_n: "已凍結",
   },
   "zh-CN": {
-    nav_monitor: "监控", nav_settings: "设置", nav_donate: "支持",
+    nav_monitor: "监控", nav_settings: "设置", nav_donate: "支持", set_lang: "语言", donate_recommended: "推荐", donate_venmo_sub: "美国用户适用",
     stat_tabs: "标签页", stat_idle: "闲置中", stat_frozen: "已冻结",
     idle_label: "后台闲置多久后冻结",
     act_discard: "自动冻结", act_reload: "自动重载", act_warn: "仅通知",
@@ -73,7 +73,7 @@ const I18N = {
     freezing: "冻结中…", frozen_n: "已冻结",
   },
   ja: {
-    nav_monitor: "モニター", nav_settings: "設定", nav_donate: "支援",
+    nav_monitor: "モニター", nav_settings: "設定", nav_donate: "支援", set_lang: "言語", donate_recommended: "おすすめ", donate_venmo_sub: "米国ユーザー向け",
     stat_tabs: "タブ数", stat_idle: "アイドル", stat_frozen: "凍結済み",
     idle_label: "バックグラウンドのアイドル時間で凍結",
     act_discard: "自動凍結", act_reload: "自動再読込", act_warn: "通知のみ",
@@ -96,7 +96,7 @@ const I18N = {
     freezing: "凍結中…", frozen_n: "凍結しました",
   },
   ko: {
-    nav_monitor: "모니터", nav_settings: "설정", nav_donate: "후원",
+    nav_monitor: "모니터", nav_settings: "설정", nav_donate: "후원", set_lang: "언어", donate_recommended: "추천", donate_venmo_sub: "미국 사용자용",
     stat_tabs: "탭 수", stat_idle: "유휴", stat_frozen: "동결됨",
     idle_label: "백그라운드 유휴 시간 후 동결",
     act_discard: "자동 동결", act_reload: "자동 새로고침", act_warn: "알림만",
@@ -119,7 +119,7 @@ const I18N = {
     freezing: "동결 중…", frozen_n: "동결됨",
   },
   es: {
-    nav_monitor: "Monitor", nav_settings: "Ajustes", nav_donate: "Apoyar",
+    nav_monitor: "Monitor", nav_settings: "Ajustes", nav_donate: "Apoyar", set_lang: "Idioma", donate_recommended: "Recomendado", donate_venmo_sub: "Usuarios de EE. UU.",
     stat_tabs: "Pestañas", stat_idle: "Inactivas", stat_frozen: "Congeladas",
     idle_label: "Congelar pestañas inactivas tras",
     act_discard: "Auto-congelar", act_reload: "Auto-recargar", act_warn: "Solo avisar",
@@ -142,7 +142,7 @@ const I18N = {
     freezing: "Congelando…", frozen_n: "Congeladas",
   },
   fr: {
-    nav_monitor: "Moniteur", nav_settings: "Réglages", nav_donate: "Soutenir",
+    nav_monitor: "Moniteur", nav_settings: "Réglages", nav_donate: "Soutenir", set_lang: "Langue", donate_recommended: "Recommandé", donate_venmo_sub: "Utilisateurs US",
     stat_tabs: "Onglets", stat_idle: "Inactifs", stat_frozen: "Gelés",
     idle_label: "Geler les onglets inactifs après",
     act_discard: "Geler auto", act_reload: "Recharger auto", act_warn: "Notifier seul.",
@@ -165,7 +165,7 @@ const I18N = {
     freezing: "Gel en cours…", frozen_n: "Gelés",
   },
   de: {
-    nav_monitor: "Monitor", nav_settings: "Einstellungen", nav_donate: "Unterstützen",
+    nav_monitor: "Monitor", nav_settings: "Einstellungen", nav_donate: "Unterstützen", set_lang: "Sprache", donate_recommended: "Empfohlen", donate_venmo_sub: "US-Nutzer",
     stat_tabs: "Tabs", stat_idle: "Inaktiv", stat_frozen: "Eingefroren",
     idle_label: "Inaktive Tabs einfrieren nach",
     act_discard: "Auto-einfrieren", act_reload: "Auto-neuladen", act_warn: "Nur melden",
@@ -188,7 +188,7 @@ const I18N = {
     freezing: "Einfrieren…", frozen_n: "Eingefroren",
   },
   pt: {
-    nav_monitor: "Monitor", nav_settings: "Ajustes", nav_donate: "Apoiar",
+    nav_monitor: "Monitor", nav_settings: "Ajustes", nav_donate: "Apoiar", set_lang: "Idioma", donate_recommended: "Recomendado", donate_venmo_sub: "Usuários dos EUA",
     stat_tabs: "Abas", stat_idle: "Ociosas", stat_frozen: "Congeladas",
     idle_label: "Congelar abas ociosas após",
     act_discard: "Auto-congelar", act_reload: "Auto-recarregar", act_warn: "Só avisar",
@@ -211,7 +211,7 @@ const I18N = {
     freezing: "Congelando…", frozen_n: "Congeladas",
   },
   ru: {
-    nav_monitor: "Монитор", nav_settings: "Настройки", nav_donate: "Поддержать",
+    nav_monitor: "Монитор", nav_settings: "Настройки", nav_donate: "Поддержать", set_lang: "Язык", donate_recommended: "Рекомендуется", donate_venmo_sub: "Для пользователей США",
     stat_tabs: "Вкладки", stat_idle: "Простой", stat_frozen: "Заморожено",
     idle_label: "Замораживать вкладки после простоя",
     act_discard: "Авто-заморозка", act_reload: "Авто-перезагрузка", act_warn: "Только уведомлять",
@@ -250,4 +250,32 @@ function detectLang() {
   return "en";
 }
 
-const T = I18N[detectLang()];
+// List for the language selector menu (label = native name)
+const LANG_OPTIONS = [
+  { code: "auto",  label: "🌐 Auto (browser)" },
+  { code: "en",    label: "English" },
+  { code: "zh-TW", label: "繁體中文" },
+  { code: "zh-CN", label: "简体中文" },
+  { code: "ja",    label: "日本語" },
+  { code: "ko",    label: "한국어" },
+  { code: "es",    label: "Español" },
+  { code: "fr",    label: "Français" },
+  { code: "de",    label: "Deutsch" },
+  { code: "pt",    label: "Português" },
+  { code: "ru",    label: "Русский" },
+];
+
+// Resolve the active translation table.
+// If user picked a specific language (stored), use it; otherwise auto-detect.
+function resolveLang(stored) {
+  if (stored && stored !== "auto" && I18N[stored]) return stored;
+  return detectLang();
+}
+
+// T is mutable so the popup can re-apply after the user switches languages.
+let T = I18N[detectLang()];
+
+function setLang(code) {
+  T = I18N[resolveLang(code)];
+  return T;
+}

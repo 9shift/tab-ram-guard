@@ -399,9 +399,6 @@
   .donate-btn-label { font-size: 13px; font-weight: 500; }
   .donate-btn-sub { font-size: 10px; color: var(--text2); }
   .github-sp { background: rgba(139,92,246,0.15); }
-  .ko-fi { background: rgba(255,94,91,0.12); }
-  .venmo { background: rgba(0,163,176,0.12); }
-  .paypal { background: rgba(0,112,186,0.12); }
   .donate-footer {
     padding: 10px 14px;
     text-align: center;
@@ -520,6 +517,12 @@
 <div id="panel-settings" class="settings-panel">
   <div class="setting-row">
     <div>
+      <div class="setting-label" data-i18n="set_lang">語言</div>
+    </div>
+    <select class="action-select" id="langSelect" style="min-width:130px"></select>
+  </div>
+  <div class="setting-row">
+    <div>
       <div class="setting-label" data-i18n="set_auto">自動監控</div>
       <div class="setting-sub" data-i18n="set_auto_sub">背景自動偵測並處理閒置分頁</div>
     </div>
@@ -564,28 +567,6 @@
       <div class="donate-btn-text">
         <span class="donate-btn-label">GitHub Sponsors</span>
         <span class="donate-btn-sub" data-i18n="donate_gh_sub">0% 手續費 · 月訂閱或一次性 · 全球</span>
-      </div>
-      <span style="font-size:10px;color:var(--text3);margin-left:auto;flex-shrink:0">推薦</span>
-    </a>
-    <a href="https://ko-fi.com/YOUR_KOFI_ID" target="_blank" class="donate-btn" id="kofiBtn">
-      <div class="donate-btn-icon ko-fi">☕</div>
-      <div class="donate-btn-text">
-        <span class="donate-btn-label">Ko-fi 請喝咖啡</span>
-        <span class="donate-btn-sub">0% 手續費 · 信用卡 / PayPal · 全球</span>
-      </div>
-    </a>
-    <a href="https://venmo.com/YOUR_VENMO_ID" target="_blank" class="donate-btn" id="venmoBtn">
-      <div class="donate-btn-icon venmo" style="font-size:13px;font-weight:700;color:#00a3b0">V</div>
-      <div class="donate-btn-text">
-        <span class="donate-btn-label">Venmo</span>
-        <span class="donate-btn-sub">美國用戶適用</span>
-      </div>
-    </a>
-    <a href="https://paypal.me/YOUR_PAYPAL_ID" target="_blank" class="donate-btn" id="paypalBtn">
-      <div class="donate-btn-icon paypal" style="font-size:13px;font-weight:700;color:#0070ba">P</div>
-      <div class="donate-btn-text">
-        <span class="donate-btn-label">PayPal</span>
-        <span class="donate-btn-sub">全球通用 · paypal.me</span>
       </div>
     </a>
   </div>

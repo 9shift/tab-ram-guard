@@ -1,6 +1,7 @@
 // popup.js — Tab RAM Guard v2 (idle-based)
 
 const DEFAULTS = {
+  lang: "auto",
   idleMinutes: 30,
   action: "discard",
   notifyEnabled: true,
@@ -14,16 +15,35 @@ let lastSnapshot = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   settings = await chrome.storage.sync.get(DEFAULTS);
+  setLang(settings.lang);          // apply saved language choice (or auto)
+  buildLangSelector();
   applyI18n();
   applySettingsToUI();
   bindEvents();
   await refresh();
   setInterval(refresh, 5000);
 
-  // Fill in your own donation links here:
+  // Donation link:
   document.getElementById("githubBtn").href = "https://github.com/sponsors/9shift";
-  // document.getElementById("paypalBtn").href = "https://paypal.me/YOUR_PAYPAL_ID";
 });
+
+// Populate the language dropdown and bind change handler
+function buildLangSelector() {
+  const sel = document.getElementById("langSelect");
+  if (!sel) return;
+  sel.innerHTML = LANG_OPTIONS.map(
+    (o) => `<option value="${o.code}">${o.label}</option>`
+  ).join("");
+  sel.value = settings.lang || "auto";
+  sel.addEventListener("change", (e) => {
+    settings.lang = e.target.value;
+    saveSettings();
+    setLang(settings.lang);  // switch active translation table
+    applyI18n();             // re-translate static UI
+    applySettingsToUI();     // re-render slider label units
+    refresh();               // re-render tab list with new language
+  });
+}
 
 // Apply translations to all [data-i18n] elements + HTML-content fields
 function applyI18n() {
@@ -155,7 +175,7 @@ function renderTabList(tabData) {
     ].join("");
 
     const faviconHtml = tab.favIconUrl
-      ? `<img class="favicon" src="${escHtml(tab.favIconUrl)}" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><div class="favicon-fallback" style="display:none">${getDomainInitial(tab.url)}</div>`
+      ? `<img class="favicon" src="${escHtml(tab.favIconUrl)}" data-fallback="1"><div class="favicon-fallback" style="display:none">${getDomainInitial(tab.url)}</div>`
       : `<div class="favicon-fallback">${getDomainInitial(tab.url)}</div>`;
 
     return `
@@ -183,6 +203,15 @@ function renderTabList(tabData) {
       const type = btn.dataset.action === "discard" ? "DISCARD_TAB" : "RELOAD_TAB";
       await chrome.runtime.sendMessage({ type, tabId: id });
       setTimeout(refresh, 600);
+    });
+  });
+
+  // Favicon load-failure fallback (CSP-safe, no inline handlers)
+  list.querySelectorAll("img.favicon[data-fallback]").forEach((img) => {
+    img.addEventListener("error", () => {
+      img.style.display = "none";
+      const fb = img.nextElementSibling;
+      if (fb) fb.style.display = "flex";
     });
   });
 }
