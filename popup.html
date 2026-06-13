@@ -454,9 +454,9 @@
 
 <!-- Tab nav -->
 <div class="tabs-nav">
-  <button class="tab-nav-btn active" data-panel="monitor">監控</button>
-  <button class="tab-nav-btn" data-panel="settings">設定</button>
-  <button class="tab-nav-btn" data-panel="donate">支持</button>
+  <button class="tab-nav-btn active" data-panel="monitor" data-i18n="nav_monitor">監控</button>
+  <button class="tab-nav-btn" data-panel="settings" data-i18n="nav_settings">設定</button>
+  <button class="tab-nav-btn" data-panel="donate" data-i18n="nav_donate">支持</button>
 </div>
 
 <!-- ── Monitor panel ── -->
@@ -465,15 +465,15 @@
   <!-- Stats -->
   <div class="stats">
     <div class="stat">
-      <span class="stat-label">分頁數</span>
+      <span class="stat-label" data-i18n="stat_tabs">分頁數</span>
       <span class="stat-value" id="statTotal">—</span>
     </div>
     <div class="stat">
-      <span class="stat-label">閒置中</span>
+      <span class="stat-label" data-i18n="stat_idle">閒置中</span>
       <span class="stat-value danger" id="statOver">—</span>
     </div>
     <div class="stat">
-      <span class="stat-label">已凍結</span>
+      <span class="stat-label" data-i18n="stat_frozen">已凍結</span>
       <span class="stat-value frozen" id="statFrozen">—</span>
     </div>
   </div>
@@ -481,12 +481,12 @@
   <!-- Idle threshold -->
   <div class="threshold-section">
     <div class="threshold-header">
-      <span class="threshold-label">⏱ 背景閒置多久後凍結</span>
+      <span class="threshold-label">⏱ <span data-i18n="idle_label">背景閒置多久後凍結</span></span>
       <div class="threshold-controls">
         <select class="action-select" id="actionSelect">
-          <option value="discard">自動凍結</option>
-          <option value="reload">自動重載</option>
-          <option value="warn">僅通知</option>
+          <option value="discard" data-i18n="act_discard">自動凍結</option>
+          <option value="reload" data-i18n="act_reload">自動重載</option>
+          <option value="warn" data-i18n="act_warn">僅通知</option>
         </select>
         <span class="threshold-value" id="idleDisplay">30 分鐘</span>
       </div>
@@ -509,8 +509,8 @@
   <div class="footer">
     <span class="refresh-note" id="refreshNote">更新中…</span>
     <div class="footer-actions">
-      <button class="btn" id="btnDiscardIdle">❄ 凍結閒置</button>
-      <button class="btn danger" id="btnDiscardAll">⚡ 凍結全部背景</button>
+      <button class="btn" id="btnDiscardIdle">❄ <span data-i18n="btn_freeze_idle">凍結閒置</span></button>
+      <button class="btn danger" id="btnDiscardAll">⚡ <span data-i18n="btn_freeze_all">凍結全部背景</span></button>
     </div>
   </div>
 
@@ -520,29 +520,29 @@
 <div id="panel-settings" class="settings-panel">
   <div class="setting-row">
     <div>
-      <div class="setting-label">自動監控</div>
-      <div class="setting-sub">背景自動偵測並處理超限分頁</div>
+      <div class="setting-label" data-i18n="set_auto">自動監控</div>
+      <div class="setting-sub" data-i18n="set_auto_sub">背景自動偵測並處理閒置分頁</div>
     </div>
     <label class="toggle"><input type="checkbox" id="settAutoEnabled" checked><span class="toggle-slider"></span></label>
   </div>
   <div class="setting-row">
     <div>
-      <div class="setting-label">排除釘選分頁</div>
-      <div class="setting-sub">已釘選的分頁不自動處理</div>
+      <div class="setting-label" data-i18n="set_pin">排除釘選分頁</div>
+      <div class="setting-sub" data-i18n="set_pin_sub">已釘選的分頁不自動處理</div>
     </div>
     <label class="toggle"><input type="checkbox" id="settExcludePinned" checked><span class="toggle-slider"></span></label>
   </div>
   <div class="setting-row">
     <div>
-      <div class="setting-label">排除播放中分頁</div>
-      <div class="setting-sub">正在播放聲音的分頁不自動處理</div>
+      <div class="setting-label" data-i18n="set_audio">排除播放中分頁</div>
+      <div class="setting-sub" data-i18n="set_audio_sub">正在播放聲音的分頁不自動處理</div>
     </div>
     <label class="toggle"><input type="checkbox" id="settExcludeAudible" checked><span class="toggle-slider"></span></label>
   </div>
   <div class="setting-row">
     <div>
-      <div class="setting-label">桌面通知</div>
-      <div class="setting-sub">超限時發送系統通知</div>
+      <div class="setting-label" data-i18n="set_notify">桌面通知</div>
+      <div class="setting-sub" data-i18n="set_notify_sub">凍結分頁時發送系統通知</div>
     </div>
     <label class="toggle"><input type="checkbox" id="settNotify" checked><span class="toggle-slider"></span></label>
   </div>
@@ -552,8 +552,8 @@
 <div id="panel-donate" class="donate-panel">
   <div class="donate-hero">
     <span class="donate-icon">🛡️</span>
-    <div class="donate-title">喜歡這個工具嗎？</div>
-    <div class="donate-desc">
+    <div class="donate-title" data-i18n="donate_title">喜歡這個工具嗎？</div>
+    <div class="donate-desc" id="donateDesc">
       Tab RAM Guard 完全免費，沒有追蹤、沒有廣告。<br>
       如果幫你省下了崩潰的煩惱，請考慮支持開發 ☕
     </div>
@@ -563,7 +563,7 @@
       <div class="donate-btn-icon github-sp" style="font-size:18px">★</div>
       <div class="donate-btn-text">
         <span class="donate-btn-label">GitHub Sponsors</span>
-        <span class="donate-btn-sub">0% 手續費 · 月訂閱或一次性 · 全球</span>
+        <span class="donate-btn-sub" data-i18n="donate_gh_sub">0% 手續費 · 月訂閱或一次性 · 全球</span>
       </div>
       <span style="font-size:10px;color:var(--text3);margin-left:auto;flex-shrink:0">推薦</span>
     </a>
@@ -589,9 +589,10 @@
       </div>
     </a>
   </div>
-  <div class="donate-footer">感謝每一位支持者 💜 — 你的支持讓這個專案持續維護</div>
+  <div class="donate-footer" id="donateFooter">感謝每一位支持者 💜 — 你的支持讓這個專案持續維護</div>
 </div>
 
+<script src="i18n.js"></script>
 <script src="popup.js"></script>
 </body>
 </html>

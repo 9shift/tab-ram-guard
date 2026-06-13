@@ -1,0 +1,4 @@
+{
+  "extName": { "message": "탭 RAM 가드" },
+  "extDesc": { "message": "유휴 백그라운드 탭을 자동 동결하여 메모리를 절약합니다." }
+}

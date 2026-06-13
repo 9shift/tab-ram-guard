@@ -1,0 +1,4 @@
+{
+  "extName": { "message": "Tab RAM Guard" },
+  "extDesc": { "message": "Congela automáticamente las pestañas inactivas para ahorrar memoria." }
+}

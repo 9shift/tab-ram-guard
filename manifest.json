@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Tab RAM Guard",
-  "version": "2.0.0",
-  "description": "Auto-freeze idle background tabs to save memory. Stop Chrome from creeping up to 3 GB.",
+  "name": "__MSG_extName__",
+  "version": "2.1.0",
+  "default_locale": "en",
+  "description": "__MSG_extDesc__",
   "permissions": [
     "tabs",
     "storage",

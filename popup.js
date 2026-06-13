@@ -14,6 +14,7 @@ let lastSnapshot = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   settings = await chrome.storage.sync.get(DEFAULTS);
+  applyI18n();
   applySettingsToUI();
   bindEvents();
   await refresh();
@@ -23,6 +24,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("githubBtn").href = "https://github.com/sponsors/9shift";
   // document.getElementById("paypalBtn").href = "https://paypal.me/YOUR_PAYPAL_ID";
 });
+
+// Apply translations to all [data-i18n] elements + HTML-content fields
+function applyI18n() {
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.dataset.i18n;
+    if (T[key]) el.textContent = T[key];
+  });
+  const desc = document.getElementById("donateDesc");
+  if (desc) desc.innerHTML = T.donate_desc;
+  const foot = document.getElementById("donateFooter");
+  if (foot) foot.textContent = T.donate_foot;
+  const note = document.getElementById("refreshNote");
+  if (note) note.textContent = T.refresh_note;
+}
 
 function bindEvents() {
   document.querySelectorAll(".tab-nav-btn").forEach((btn) => {
@@ -51,18 +66,18 @@ function bindEvents() {
 
   document.getElementById("btnDiscardAll").addEventListener("click", async () => {
     const btn = document.getElementById("btnDiscardAll");
-    btn.textContent = "凍結中…";
+    btn.textContent = T.freezing;
     const res = await chrome.runtime.sendMessage({ type: "DISCARD_ALL_BG" });
-    btn.textContent = `⚡ 已凍結 ${res.count} 個`;
-    setTimeout(() => { btn.textContent = "⚡ 凍結全部背景"; refresh(); }, 1500);
+    btn.textContent = `⚡ ${T.frozen_n} ${res.count}`;
+    setTimeout(() => { btn.textContent = `⚡ ${T.btn_freeze_all}`; refresh(); }, 1500);
   });
 
   document.getElementById("btnDiscardIdle").addEventListener("click", async () => {
     const btn = document.getElementById("btnDiscardIdle");
-    btn.textContent = "凍結中…";
+    btn.textContent = T.freezing;
     const res = await chrome.runtime.sendMessage({ type: "DISCARD_IDLE_NOW" });
-    btn.textContent = `❄ 已凍結 ${res.count} 個`;
-    setTimeout(() => { btn.textContent = "❄ 凍結閒置"; refresh(); }, 1500);
+    btn.textContent = `❄ ${T.frozen_n} ${res.count}`;
+    setTimeout(() => { btn.textContent = `❄ ${T.btn_freeze_idle}`; refresh(); }, 1500);
   });
 
   bindToggle("settAutoEnabled", "autoEnabled");
@@ -98,7 +113,7 @@ async function refresh() {
     updateAutoBanner();
   } catch (e) {
     document.getElementById("tabList").innerHTML =
-      `<div class="empty">無法讀取分頁資料</div>`;
+      `<div class="empty">${T.load_fail}</div>`;
   }
 }
 
@@ -113,7 +128,7 @@ function renderStats({ activeTabCount, idleCount, frozenCount }) {
 function renderTabList(tabData) {
   const list = document.getElementById("tabList");
   if (!tabData || tabData.length === 0) {
-    list.innerHTML = `<div class="empty">沒有開啟的分頁</div>`;
+    list.innerHTML = `<div class="empty">${T.no_tabs}</div>`;
     return;
   }
 
@@ -125,10 +140,10 @@ function renderTabList(tabData) {
       : "ok";
     const rowCls = state === "danger" ? "is-danger" : state === "warn" ? "is-warn" : tab.discarded ? "is-frozen" : "";
 
-    const statusText = tab.discarded ? "凍結中"
-      : tab.active ? "使用中"
-      : tab.willFreeze ? "即將凍結"
-      : `閒置 ${formatMin(tab.idleMin)}`;
+    const statusText = tab.discarded ? T.st_frozen
+      : tab.active ? T.st_using
+      : tab.willFreeze ? T.st_will
+      : `${T.st_idle} ${formatMin(tab.idleMin)}`;
     const statusCls = tab.discarded ? "frozen"
       : tab.active ? "ok"
       : tab.willFreeze ? "danger"
@@ -156,8 +171,8 @@ function renderTabList(tabData) {
         <span class="mem-text ${statusCls}">${statusText}</span>
         <div class="row-actions">
           ${!tab.discarded
-            ? `<button class="row-btn red" data-action="discard" data-id="${tab.id}" title="立即凍結">❄</button>`
-            : `<button class="row-btn" data-action="reload" data-id="${tab.id}" title="解除凍結">↻</button>`}
+            ? `<button class="row-btn red" data-action="discard" data-id="${tab.id}" title="${T.title_freeze}">❄</button>`
+            : `<button class="row-btn" data-action="reload" data-id="${tab.id}" title="${T.title_unfreeze}">↻</button>`}
         </div>
       </div>`;
   }).join("");
@@ -175,13 +190,13 @@ function renderTabList(tabData) {
 function updateAutoBanner() {
   const banner = document.getElementById("autoBanner");
   const label = document.getElementById("autoActionLabel");
-  const map = { discard: "凍結", reload: "重新載入", warn: "通知" };
+  const map = { discard: T.act_freeze, reload: T.act_reloadw, warn: T.act_notify };
   if (settings.autoEnabled) {
     banner.className = "auto-banner";
-    label.textContent = map[settings.action] || "處理";
+    banner.innerHTML = `🤖 ${T.auto_on_pre}<span id="autoActionLabel">${map[settings.action]}</span>`;
   } else {
     banner.className = "auto-banner off";
-    banner.textContent = "🔴 自動監控已關閉";
+    banner.textContent = `🔴 ${T.auto_off}`;
   }
 }
 
@@ -200,9 +215,9 @@ function saveSettings() { chrome.storage.sync.set(settings); }
 function formatMin(min) {
   if (min >= 60) {
     const h = Math.floor(min / 60), m = min % 60;
-    return m > 0 ? `${h}h ${m}m` : `${h} 小時`;
+    return m > 0 ? `${h}${T.hour} ${m}${T.min}` : `${h} ${T.hours}`;
   }
-  return `${min} 分鐘`;
+  return `${min} ${T.min}`;
 }
 function getDomain(url) { try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return url; } }
 function getDomainInitial(url) { try { return new URL(url).hostname.replace(/^www\./, "")[0]?.toUpperCase() || "?"; } catch { return "?"; } }

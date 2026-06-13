@@ -1,0 +1,4 @@
+{
+  "extName": { "message": "Tab RAM Guard" },
+  "extDesc": { "message": "Auto-freeze idle background tabs to save memory. Stop Chrome from creeping up to 3 GB." }
+}
